@@ -1,18 +1,11 @@
 package com.example.ex4;
 
+import android.content.Intent;
+import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.widget.TextView;
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.EditText;
-
-import java.net.InetAddress;
-
-public class DisplayJoystick extends AppCompatActivity {
+public class DisplayJoystick extends AppCompatActivity implements Joystick.JoystickListener {
 
     TcpClient tcpClient;
 
@@ -24,7 +17,23 @@ public class DisplayJoystick extends AppCompatActivity {
         String ip = intent.getStringExtra("ip");
         int port = intent.getIntExtra("port", 0);
         this.tcpClient = new TcpClient(ip, port);
-        this.tcpClient.run();
+       // this.tcpClient.run();
+        Joystick joystick = new Joystick(this);
+        setContentView(R.layout.activity_display_joystick);
+
+
+    }
+
+    @Override
+    public void onJoystickMoved(float xPercent, float yPercent, int id) {
+        switch (id) {
+            case R.id.joystickRight:
+                //         Log.d("Right Joystick", "X percent: " + xPercent + " Y percent: " + yPercent);
+                break;
+            case R.id.joystickLeft:
+                //           Log.d("Left Joystick", "X percent: " + xPercent + " Y percent: " + yPercent);
+                break;
+        }
     }
 
     protected void onDestroy() {
@@ -32,8 +41,5 @@ public class DisplayJoystick extends AppCompatActivity {
         this.tcpClient.stopClient();
     }
 
-    private void openClient(String ip, int port) {
 
-
-    }
 }
