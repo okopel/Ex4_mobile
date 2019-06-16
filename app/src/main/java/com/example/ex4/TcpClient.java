@@ -84,13 +84,10 @@ public class TcpClient {
             Socket socket = new Socket(serverAddr, port);
 
             try {
-
                 //sends the message to the server
                 mBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-
                 //receives the message which the server sends back
                 mBufferIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
 
                 //in this while the client listens for the messages sent by the server
                 while (mRun) {
