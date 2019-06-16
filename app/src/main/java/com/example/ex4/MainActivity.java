@@ -21,11 +21,13 @@ public class MainActivity extends AppCompatActivity {
      * @param view the connect screen.
      */
     public void connect(View view) {
-        EditText ip = (EditText) findViewById(R.id.ip_box);
-        EditText port = (EditText) findViewById(R.id.port_box);
+        EditText ip = findViewById(R.id.ip_box);
+        String ip_txt = ip.getText().toString();
+        EditText port = findViewById(R.id.port_box);
+        int port_txt = Integer.parseInt(port.getText().toString());
         Intent intent = new Intent(this, DisplayJoystick.class);
-        intent.putExtra("ip", ip.toString());
-        intent.putExtra("port", Integer.parseInt(port.toString()));
+        intent.putExtra("ip", ip_txt);
+        intent.putExtra("port", port_txt);
         startActivity(intent);
     }
 }

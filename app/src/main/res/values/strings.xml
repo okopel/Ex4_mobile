@@ -3,4 +3,5 @@
     <string name="ip">IP:</string>
     <string name="port">Port:</string>
     <string name="btn_txt">Connect!</string>
+    <string name="showIpAndPort">TextView</string>
 </resources>
