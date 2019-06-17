@@ -43,9 +43,10 @@ class myJoystick {
         params = mLayout.getLayoutParams();
     }
 
-    int getStickX() {
-        return (int) (Math.min(distance, (params.width / 2f) - OFFSET) * Math.cos(Math.toRadians(angle)));
-
+    double getStickX() {
+        double x = (Math.min(distance, (params.width / 2f) - OFFSET) * Math.cos(Math.toRadians(angle)));
+        x /= (params.width / 2f) - OFFSET;
+        return x;
         /*if (distance > min_distance && touch_state) {
         //    return stickX;
         }
@@ -53,8 +54,10 @@ class myJoystick {
 
     }
 
-    int getStickY() {
-        return (int) (Math.min(distance, (params.width / 2f) - OFFSET) * Math.sin(Math.toRadians(angle)));
+    double getStickY() {
+        double y = (Math.min(distance, (params.height / 2f) - OFFSET) * Math.sin(Math.toRadians(angle)));
+        y /= (params.height / 2f) - OFFSET;
+        return y;
     /*    if (distance > min_distance && touch_state) {
             return stickY;
         }

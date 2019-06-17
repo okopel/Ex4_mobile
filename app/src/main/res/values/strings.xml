@@ -11,6 +11,6 @@
     <string name="elevator"><![CDATA[<-Elevator->]]></string>
     <string name="stickX">stickX</string>
     <string name="stickY">stickY</string>
-    <string name="IP">10.0.0.2</string>
+    <string name="IP">10.0.2.2</string>
     <string name="Port">5402</string>
 </resources>
