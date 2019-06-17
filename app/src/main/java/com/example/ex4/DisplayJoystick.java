@@ -19,7 +19,12 @@ public class DisplayJoystick extends AppCompatActivity {
     private TextView stick_y;
     private myJoystick js;
 
-
+    /**
+     * onCreate get the ip and port, open client, draw the joystick.
+     * this func also define the listiner of the joystick
+     *
+     * @param savedInstanceState the instance
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,6 +34,9 @@ public class DisplayJoystick extends AppCompatActivity {
         final int port = intent.getIntExtra("port", 0);
         new Thread(new Runnable() {
             @Override
+            /**
+             * open tcpClient
+             */
             public void run() {
                 tcpClient = new TcpClient(ip, port);
                 tcpClient.run();
@@ -37,8 +45,11 @@ public class DisplayJoystick extends AppCompatActivity {
         createJoystick();
     }
 
-
+    /**
+     * Create the joystick and define the listener
+     */
     private void createJoystick() {
+        //text boxes
         angle_view = findViewById(R.id.angle_view);
         distance_view = findViewById(R.id.distance_view);
         stick_x = findViewById(R.id.stickX);
@@ -54,17 +65,9 @@ public class DisplayJoystick extends AppCompatActivity {
         OnTouchListener otl = new OnTouchListener() {
             public boolean onTouch(View v, MotionEvent e) {
                 js.drawStick(e);
-                if (e.getAction() == MotionEvent.ACTION_DOWN || e.getAction() == MotionEvent.ACTION_MOVE) {
-                    angle_view.setText("Angle : " + js.getAngle());
-                    distance_view.setText("Distance : " + js.getDistance());
-                    stick_x.setText("aileron : " + (float) js.getStickX());
-                    stick_y.setText("elevator: " + (float) js.getStickY());
-                } else if (e.getAction() == MotionEvent.ACTION_UP) {
+                writeArgsInTextBosex(e);
+                if (e.getAction() == MotionEvent.ACTION_UP) {
                     tcpClient.sendMessage(js.getStickX(), js.getStickY());
-                    angle_view.setText("Angle :");
-                    distance_view.setText("Distance :");
-                    stick_x.setText("aileron : " + js.getStickX());
-                    stick_y.setText("elevator: " + js.getStickY());
                     js.drawBasicStick();
                 }
                 return true;
@@ -74,10 +77,30 @@ public class DisplayJoystick extends AppCompatActivity {
         layout_joystick.setOnTouchListener(otl);
     }
 
+    /**
+     * Write the updated args in textView
+     *
+     * @param e the motion event
+     */
+    private void writeArgsInTextBosex(MotionEvent e) {
+        if (e.getAction() == MotionEvent.ACTION_DOWN || e.getAction() == MotionEvent.ACTION_MOVE) {
+            angle_view.setText("Angle : " + js.getAngle());
+            distance_view.setText("Distance : " + js.getDistance());
+            stick_x.setText("aileron : " + (float) js.getStickX());
+            stick_y.setText("elevator: " + (float) js.getStickY());
+        } else if (e.getAction() == MotionEvent.ACTION_UP) {
+            angle_view.setText("Angle :");
+            distance_view.setText("Distance :");
+            stick_x.setText("aileron : " + js.getStickX());
+            stick_y.setText("elevator: " + js.getStickY());
+        }
+    }
+
+    /**
+     * onDestroy close the client
+     */
     protected void onDestroy() {
         super.onDestroy();
         this.tcpClient.closeClient();
     }
-
-
 }
