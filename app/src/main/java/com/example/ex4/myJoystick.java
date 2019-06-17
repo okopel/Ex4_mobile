@@ -10,15 +10,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 
+/**
+ * Define Joystick
+ */
 class myJoystick {
-
-    private ViewGroup mLayout;
-    private LayoutParams params;
-    private int stick_width, stick_height, min_distance = 50, offset = 90;
+    private final ViewGroup mLayout;
+    private final LayoutParams params;
+    private final int stick_width;
+    private final int stick_height;
+    private final int offset = 90;
+    private final DrawCanvas draw;
+    private final Paint paint;
+    private final Bitmap stick;
     private float distance = 0, angle = 0;
-    private DrawCanvas draw;
-    private Paint paint;
-    private Bitmap stick;
     private boolean isTouched = false;
 
     myJoystick(Context context, ViewGroup layout, int stick_res_id) {
@@ -33,26 +37,35 @@ class myJoystick {
         paint.setAlpha(100);
     }
 
+
+    /**
+     * get the x arg normalize from -1 to 1
+     *
+     * @return x
+     */
     double getStickX() {
         double x = (Math.min(distance, (params.width / 2f) - offset) * Math.cos(Math.toRadians(angle)));
         x /= (params.width / 2f) - offset; //normalize
         return x;
-
     }
 
+    /**
+     * get the y arg normalize from -1 to 1
+     *
+     * @return y
+     */
     double getStickY() {
         double y = (Math.min(distance, (params.height / 2f) - offset) * Math.sin(Math.toRadians(angle)));
-        y /= (params.height / 2f) - offset;
-        return y;
+        y /= ((params.height / 2f) - offset);
+        return -y;
 
     }
 
     void drawStick(MotionEvent e) {
         int position_x = (int) (e.getX() - (params.width / 2f));
         int position_y = (int) (e.getY() - (params.height / 2f));
-        distance = (float) Math.sqrt(Math.pow(position_x, 2f) + Math.pow(position_y, 2));
+        distance = (float) Math.sqrt(Math.pow(position_x, 2) + Math.pow(position_y, 2));
         angle = (float) cal_angle(position_x, position_y);
-
         float centerW = (params.width / 2f) - offset;
         if (e.getAction() == MotionEvent.ACTION_DOWN) {
             if (distance <= centerW) {
@@ -60,14 +73,13 @@ class myJoystick {
                 draw();
                 isTouched = true;
             }
-        } else if (e.getAction() == MotionEvent.ACTION_MOVE && isTouched) {
+        } else if ((e.getAction() == MotionEvent.ACTION_MOVE) && isTouched) {
             if (distance <= centerW) {
                 draw.position(e.getX(), e.getY());
                 draw();
             } else if (distance > centerW) {
                 float x = (float) (Math.cos(Math.toRadians(cal_angle(position_x, position_y))) * centerW);
                 float y = (float) (Math.sin(Math.toRadians(cal_angle(position_x, position_y))) * ((params.height / 2f) - offset));
-
                 x += (params.width / 2f);
                 y += (params.height / 2f);
                 draw.position(x, y);
@@ -82,14 +94,14 @@ class myJoystick {
     }
 
     float getAngle() {
-        if (isTouched && (distance > min_distance)) {
+        if (distance > 50) {
             return angle;
         }
         return 0;
     }
 
     float getDistance() {
-        if (isTouched && (distance > min_distance)) {
+        if (distance > 50) {
             return distance;
         }
         return 0;
@@ -99,19 +111,6 @@ class myJoystick {
         draw.position(params.width / 2f, params.height / 2f);
         draw();
     }
-
-    void setStickSize(int width, int height) {
-        stick = Bitmap.createScaledBitmap(stick, width, height, false);
-        stick_width = stick.getWidth();
-        stick_height = stick.getHeight();
-    }
-
-
-    void setLayoutSize(int width, int height) {
-        params.width = width;
-        params.height = height;
-    }
-
 
     private double cal_angle(float x, float y) {
         double deg = Math.toDegrees(Math.atan(y / x));
@@ -128,10 +127,7 @@ class myJoystick {
     }
 
     private void draw() {
-        try {
-            mLayout.removeView(draw);
-        } catch (Exception ignored) {
-        }
+        mLayout.removeView(draw);
         mLayout.addView(draw);
     }
 

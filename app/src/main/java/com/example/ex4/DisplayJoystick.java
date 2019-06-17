@@ -21,7 +21,7 @@ public class DisplayJoystick extends AppCompatActivity {
 
     /**
      * onCreate get the ip and port, open client, draw the joystick.
-     * this func also define the listiner of the joystick
+     * this func also define the listener of the joystick
      *
      * @param savedInstanceState the instance
      */
@@ -34,9 +34,6 @@ public class DisplayJoystick extends AppCompatActivity {
         final int port = intent.getIntExtra("port", 0);
         new Thread(new Runnable() {
             @Override
-            /**
-             * open tcpClient
-             */
             public void run() {
                 tcpClient = new TcpClient(ip, port);
                 tcpClient.run();
@@ -59,9 +56,8 @@ public class DisplayJoystick extends AppCompatActivity {
         layout_joystick = findViewById(R.id.layout_joystick);
 
         js = new myJoystick(getApplicationContext(), layout_joystick, R.drawable.image_button);
-        js.setStickSize(150, 150);
-        js.setLayoutSize(500, 500);
-
+        //set the inition port or land
+        //  js.setPortrait(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
         OnTouchListener otl = new OnTouchListener() {
             public boolean onTouch(View v, MotionEvent e) {
                 js.drawStick(e);

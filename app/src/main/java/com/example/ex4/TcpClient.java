@@ -6,8 +6,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 class TcpClient {
-    private String ip; //server IP address
-    private int port;
+    private final String ip; //server IP address
+    private final int port;
     // used to send messages
     private PrintWriter mBufferOut;
 
