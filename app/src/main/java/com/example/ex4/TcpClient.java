@@ -5,7 +5,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class TcpClient implements Runnable {
+class TcpClient {
     private String ip; //server IP address
     private int port;
     // used to send messages
@@ -30,11 +30,8 @@ public class TcpClient implements Runnable {
             @Override
             public void run() {
                 if (mBufferOut != null) {
-                    System.out.println(message);
-                    mBufferOut.println(message);
                     mBufferOut.write(message);
                     mBufferOut.flush();
-
                 }
             }
         }).start();
@@ -51,7 +48,7 @@ public class TcpClient implements Runnable {
     /**
      * Close the connection and release the members
      */
-    void stopClient() {
+    void closeClient() {
         if (mBufferOut != null) {
             mBufferOut.flush();
             mBufferOut.close();
@@ -59,15 +56,14 @@ public class TcpClient implements Runnable {
         mBufferOut = null;
     }
 
-    public void run() {
+    /**
+     * Open Tcp client
+     */
+    void run() {
         try {
             //create a socket to make the connection with the server
             Socket socket = new Socket(ip, port);
-            try {
-                mBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-            } catch (Exception e) {
-                System.out.println("catch:" + e.getMessage());
-            }
+            mBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
         } catch (Exception e) {
             System.out.println("catch2:" + e.getMessage());
         }

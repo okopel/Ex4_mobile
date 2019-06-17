@@ -12,87 +12,64 @@ import android.view.ViewGroup.LayoutParams;
 
 class myJoystick {
 
-    private int STICK_ALPHA = 200;
-    private int LAYOUT_ALPHA = 200;
-    private int OFFSET = 0;
-
-    private Context mContext;
     private ViewGroup mLayout;
     private LayoutParams params;
-    private int stick_width, stick_height;
-    private int position_x = 0, position_y = 0, min_distance = 0;
+    private int stick_width, stick_height, min_distance = 50, offset = 90;
     private float distance = 0, angle = 0;
-
     private DrawCanvas draw;
     private Paint paint;
     private Bitmap stick;
-
-    private boolean touch_state = false;
+    private boolean isTouched = false;
 
     myJoystick(Context context, ViewGroup layout, int stick_res_id) {
-        mContext = context;
-
-        stick = BitmapFactory.decodeResource(mContext.getResources(), stick_res_id);
-
+        stick = BitmapFactory.decodeResource(context.getResources(), stick_res_id);
         stick_width = stick.getWidth();
         stick_height = stick.getHeight();
-
-        draw = new DrawCanvas(mContext);
+        draw = new DrawCanvas(context);
         paint = new Paint();
         mLayout = layout;
         params = mLayout.getLayoutParams();
+        mLayout.getBackground().setAlpha(150);
+        paint.setAlpha(100);
     }
 
     double getStickX() {
-        double x = (Math.min(distance, (params.width / 2f) - OFFSET) * Math.cos(Math.toRadians(angle)));
-        x /= (params.width / 2f) - OFFSET;
+        double x = (Math.min(distance, (params.width / 2f) - offset) * Math.cos(Math.toRadians(angle)));
+        x /= (params.width / 2f) - offset; //normalize
         return x;
-        /*if (distance > min_distance && touch_state) {
-        //    return stickX;
-        }
-        return 0;*/
 
     }
 
     double getStickY() {
-        double y = (Math.min(distance, (params.height / 2f) - OFFSET) * Math.sin(Math.toRadians(angle)));
-        y /= (params.height / 2f) - OFFSET;
+        double y = (Math.min(distance, (params.height / 2f) - offset) * Math.sin(Math.toRadians(angle)));
+        y /= (params.height / 2f) - offset;
         return y;
-    /*    if (distance > min_distance && touch_state) {
-            return stickY;
-        }
-        return 0;*/
+
     }
 
     void drawStick(MotionEvent e) {
-        position_x = (int) (e.getX() - (params.width / 2f));
-        position_y = (int) (e.getY() - (params.height / 2f));
+        int position_x = (int) (e.getX() - (params.width / 2f));
+        int position_y = (int) (e.getY() - (params.height / 2f));
         distance = (float) Math.sqrt(Math.pow(position_x, 2f) + Math.pow(position_y, 2));
         angle = (float) cal_angle(position_x, position_y);
 
-
+        float centerW = (params.width / 2f) - offset;
         if (e.getAction() == MotionEvent.ACTION_DOWN) {
-            if (distance <= (params.width / 2f) - OFFSET) {
+            if (distance <= centerW) {
                 draw.position(e.getX(), e.getY());
-                //this.stickX = (int)e.getX();
-                //this.stickY = (int)e.getY();
                 draw();
-                touch_state = true;
+                isTouched = true;
             }
-        } else if (e.getAction() == MotionEvent.ACTION_MOVE && touch_state) {
-            if (distance <= (params.width / 2f) - OFFSET) {
+        } else if (e.getAction() == MotionEvent.ACTION_MOVE && isTouched) {
+            if (distance <= centerW) {
                 draw.position(e.getX(), e.getY());
-                //this.stickX = (int)e.getX();
-                //this.stickY = (int)e.getY();
                 draw();
-            } else if (distance > (params.width / 2f) - OFFSET) {
-                float x = (float) (Math.cos(Math.toRadians(cal_angle(position_x, position_y))) * ((params.width / 2f) - OFFSET));
-                float y = (float) (Math.sin(Math.toRadians(cal_angle(position_x, position_y))) * ((params.height / 2f) - OFFSET));
-                //  this.stickX = (int)x;
-                // this.stickY = (int)y;
+            } else if (distance > centerW) {
+                float x = (float) (Math.cos(Math.toRadians(cal_angle(position_x, position_y))) * centerW);
+                float y = (float) (Math.sin(Math.toRadians(cal_angle(position_x, position_y))) * ((params.height / 2f) - offset));
+
                 x += (params.width / 2f);
                 y += (params.height / 2f);
-
                 draw.position(x, y);
                 draw();
             } else {
@@ -100,67 +77,28 @@ class myJoystick {
             }
         } else if (e.getAction() == MotionEvent.ACTION_UP) {
             mLayout.removeView(draw);
-            touch_state = false;
+            isTouched = false;
         }
-    }
-
-
-    int getX() {
-        if (distance > min_distance && touch_state) {
-            return position_x;
-        }
-        return 0;
-    }
-
-    int getY() {
-        if (distance > min_distance && touch_state) {
-            return position_y;
-        }
-        return 0;
     }
 
     float getAngle() {
-        if (distance > min_distance && touch_state) {
+        if (isTouched && (distance > min_distance)) {
             return angle;
         }
         return 0;
     }
 
     float getDistance() {
-        if (distance > min_distance && touch_state) {
+        if (isTouched && (distance > min_distance)) {
             return distance;
         }
         return 0;
     }
 
-    void setMinimumDistance(int minDistance) {
-        min_distance = minDistance;
-    }
-
     void drawBasicStick() {
         draw.position(params.width / 2f, params.height / 2f);
-        //   this.stickX = 0;
-        //  this.stickY = 0;
         draw();
     }
-
-
-    void setOffset(int offset) {
-        OFFSET = offset;
-    }
-
-
-    void setStickAlpha(int alpha) {
-        STICK_ALPHA = alpha;
-        paint.setAlpha(alpha);
-    }
-
-
-    void setLayoutAlpha(int alpha) {
-        LAYOUT_ALPHA = alpha;
-        mLayout.getBackground().setAlpha(alpha);
-    }
-
 
     void setStickSize(int width, int height) {
         stick = Bitmap.createScaledBitmap(stick, width, height, false);
@@ -176,15 +114,17 @@ class myJoystick {
 
 
     private double cal_angle(float x, float y) {
-        if (x >= 0 && y >= 0)
-            return Math.toDegrees(Math.atan(y / x));
-        else if (x < 0 && y >= 0)
-            return Math.toDegrees(Math.atan(y / x)) + 180;
-        else if (x < 0 && y < 0)
-            return Math.toDegrees(Math.atan(y / x)) + 180;
-        else if (x >= 0 && y < 0)
-            return Math.toDegrees(Math.atan(y / x)) + 360;
-        return 0;
+        double deg = Math.toDegrees(Math.atan(y / x));
+        if (x >= 0) {
+            if (y >= 0) {
+                return deg;
+            } else {
+                return deg + 360;
+            }
+        } else {
+            return deg + 180;
+        }
+
     }
 
     private void draw() {
@@ -208,9 +148,7 @@ class myJoystick {
 
         private void position(float pos_x, float pos_y) {
             x = pos_x - (stick_width / 2f);
-            //     stickX = (int)x;
             y = pos_y - (stick_height / 2f);
-            //    stickY = (int)y;
         }
     }
 }

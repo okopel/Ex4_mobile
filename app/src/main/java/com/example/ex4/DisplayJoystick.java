@@ -1,6 +1,5 @@
 package com.example.ex4;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -14,8 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 public class DisplayJoystick extends AppCompatActivity {
 
     private TcpClient tcpClient;
-    private TextView x_view;
-    private TextView y_view;
     private TextView angle_view;
     private TextView distance_view;
     private TextView stick_x;
@@ -42,8 +39,6 @@ public class DisplayJoystick extends AppCompatActivity {
 
 
     private void createJoystick() {
-        x_view = findViewById(R.id.x_view);
-        y_view = findViewById(R.id.y_view);
         angle_view = findViewById(R.id.angle_view);
         distance_view = findViewById(R.id.distance_view);
         stick_x = findViewById(R.id.stickX);
@@ -55,30 +50,21 @@ public class DisplayJoystick extends AppCompatActivity {
         js = new myJoystick(getApplicationContext(), layout_joystick, R.drawable.image_button);
         js.setStickSize(150, 150);
         js.setLayoutSize(500, 500);
-        js.setLayoutAlpha(150);
-        js.setStickAlpha(100);
-        js.setOffset(90);
-        js.setMinimumDistance(50);
+
         OnTouchListener otl = new OnTouchListener() {
-            @SuppressLint("SetTextI18n")
-            public boolean onTouch(View arg0, MotionEvent e) {
+            public boolean onTouch(View v, MotionEvent e) {
                 js.drawStick(e);
                 if (e.getAction() == MotionEvent.ACTION_DOWN || e.getAction() == MotionEvent.ACTION_MOVE) {
-
-                    x_view.setText("X : " + js.getX());
-                    y_view.setText("Y : " + js.getY());
                     angle_view.setText("Angle : " + js.getAngle());
                     distance_view.setText("Distance : " + js.getDistance());
-                    stick_x.setText("stickX : " + (float) js.getStickX());
-                    stick_y.setText("stickY : " + (float) js.getStickY());
+                    stick_x.setText("aileron : " + (float) js.getStickX());
+                    stick_y.setText("elevator: " + (float) js.getStickY());
                 } else if (e.getAction() == MotionEvent.ACTION_UP) {
                     tcpClient.sendMessage(js.getStickX(), js.getStickY());
-                    x_view.setText("X :");
-                    y_view.setText("Y :");
                     angle_view.setText("Angle :");
                     distance_view.setText("Distance :");
-                    stick_x.setText("stickX : " + js.getStickX());
-                    stick_y.setText("stickY : " + js.getStickY());
+                    stick_x.setText("aileron : " + js.getStickX());
+                    stick_y.setText("elevator: " + js.getStickY());
                     js.drawBasicStick();
                 }
                 return true;
@@ -90,7 +76,7 @@ public class DisplayJoystick extends AppCompatActivity {
 
     protected void onDestroy() {
         super.onDestroy();
-        this.tcpClient.stopClient();
+        this.tcpClient.closeClient();
     }
 
 
